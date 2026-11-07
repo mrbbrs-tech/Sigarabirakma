@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bırakma Protokolü</title>
+<meta name="theme-color" content="#1d6b57">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bırakma">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f6f6f3;--card:#fff;--tx:#1a1a1a;--mu:#6b6b66;--ac:#1d6b57;--bd:#e2e2dc;--rd:#b3261e;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121413;--card:#1c1f1e;--tx:#ececE8;--mu:#9a9a94;--ac:#52c4a4;--bd:#2c302e;--rd:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121413;--card:#1c1f1e;--tx:#ececE8;--mu:#9a9a94;--ac:#52c4a4;--bd:#2c302e;--rd:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding-bottom:76px}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 14px}h2{font-size:16px;margin:18px 0 8px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-top:10px}.g .c{margin:0}
+.n{font-size:26px;font-weight:700;color:var(--ac)}.l{font-size:12px;color:var(--mu)}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+textarea{resize:vertical}
+button{font:inherit;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);width:100%;margin-top:10px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+button.d{color:var(--rd);border-color:var(--rd)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{margin:0;border:0;border-radius:0;background:none;flex:1;font-size:12px;padding:14px 2px;color:var(--mu)}
+nav button.a{color:var(--ac);font-weight:700}
+.big{font-size:56px;font-weight:700;text-align:center;color:var(--ac)}.ph{text-align:center;font-size:18px;margin:8px 0}
+.sev{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.sev button{margin:0;padding:12px 0}
+details{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:8px}summary{font-weight:600}
+li{margin:4px 0}
+.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.bar.s{height:5px;flex:1}.st{display:flex;align-items:center;gap:8px;font-size:13px;margin:7px 0}.st b{width:58px;flex:none}.st span{width:18px;text-align:right;flex:none;color:var(--ac)}
+.msg{font-size:14px;color:var(--ac);margin:8px 0}
+.sp{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:8px 0 3px}
+</style>
+</head>
+<body>
+<main id="m"></main>
+<nav id="nv"></nav>
+<script>
+var K='birak-v1',S=load(),tab='bugun',tm=null,tlt=null,rl=false,msg='',pend=null,raw='',DL=null;
+var ST=[[1/3,'20 dk','Nabız ve tansiyon normale yaklaşır'],[8,'8 saat','Kandaki karbonmonoksit yarıya iner'],[24,'24 saat','Karbonmonoksit vücuttan temizlenir'],[48,'48 saat','Nikotin temizlenir, tat ve koku iyileşmeye başlar'],[72,'72 saat','Bronşlar gevşer, nefes almak kolaylaşır'],[336,'2 hafta','Dolaşım düzelir, akciğer fonksiyonu artmaya başlar'],[2160,'3 ay','Dolaşım ve akciğer fonksiyonu belirgin iyileşir'],[6480,'9 ay','Öksürük ve nefes darlığı azalır'],[8760,'1 yıl','Koroner kalp hastalığı riski yarıya iner']];
+var P=['Nefes: 4 sn burundan al, 6-8 sn ağızdan ver.','Soğuk suyu yavaş yavaş iç.','Ortamı değiştir: kalk, başka odaya ya da dışarı geç.'];
+var T=[['bugun','Bugün'],['acil','Acil'],['gunluk','Günlük'],['gecmis','Geçmiş'],['proto','Protokol'],['ayar','Ayarlar']];
+var TR=['-','kahve','yemek sonrası','stres','sosyal','alkol','sıkıntı','diğer'],BR=['-','nefes','su','yürüyüş','yer değiştirme','sakız','diğer'],SV=['-',1,2,3,4,5,6,7,8,9,10];
+if(window.claude&&claude.use)claude.use('downloads').then(function(d){DL=d}).catch(function(){});
+
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function pos(v,d){v=+v;return v>0&&isFinite(v)?v:d}
+function cl(v,m){v=Math.round(+v);return isFinite(v)?Math.min(m,Math.max(0,v)):0}
+function str(v){return String(v||'-').slice(0,30)}
+function ds(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dd(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5)}
+function tl(n){return n.toLocaleString('tr-TR',{maximumFractionDigits:0})+' ₺'}
+function hm(ts){return new Date(ts).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
+function opts(a,v){return a.map(function(x){return '<option'+(String(x)===String(v)?' selected':'')+'>'+x+'</option>'}).join('')}
+
+/* Eski kayıtlar (kriz sayısı + tek tetikleyici/çözüm) kriz listesine çevrilir. */
+function norm(L){if(!Array.isArray(L.list)){L.list=[];var n=cl(L.crises,999);
+  for(var i=0;i<n;i++)L.list.push({ts:0,trig:i?'-':str(L.trig),brake:i?'-':str(L.brake),sev:i?0:cl(L.maxSev,10)})}
+ delete L.crises;delete L.trig;delete L.brake;delete L.maxSev;L.nrt=!!L.nrt;L.note=String(L.note||'');return L}
+function load(){var d={logs:{},relapse:[],relTs:[],smokes:[]};
+ try{var r=JSON.parse(localStorage.getItem(K));if(r&&typeof r==='object'){d=r;d.logs=d.logs||{};d.relapse=d.relapse||[];d.relTs=d.relTs||[];d.smokes=Array.isArray(d.smokes)?d.smokes:[];
+  if(!d.quitTs&&d.quitAt)d.quitTs=new Date(d.quitAt+'T00:00:00').getTime();
+  Object.keys(d.logs).forEach(function(k){norm(d.logs[k])})}}catch(e){}
+ return d}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function lg(d){return S.logs[d]||(S.logs[d]=norm({}))}
+
+function hours(){var t=S.quitTs;S.relTs.forEach(function(x){if(x>t)t=x});
+ S.relapse.forEach(function(d){var x=new Date(d+'T00:00:00').getTime();if(x>t)t=x});
+ return Math.max(0,(Date.now()-t)/36e5)}
+function stats(){var tot=Math.max(0,dd(S.quitAt,ds())),ok=Math.max(0,tot-S.relapse.length),per=S.perDay*S.pack/S.size;
+ return{streak:Math.floor(hours()/24),money:ok*per,avoided:ok*S.perDay}}
+function left(h){return h<1?Math.max(1,Math.ceil(h*60))+' dk':h<48?Math.ceil(h)+' saat':Math.ceil(h/24)+' gün'}
+
+function tlHTML(){var h=hours(),n=-1,i,head,pct;
+ for(i=0;i<ST.length;i++)if(ST[i][0]>h){n=i;break}
+ var dn=ST.filter(function(s){return h>=s[0]}).reverse(),
+  ok=dn.length?'<ul style="margin:0;padding-left:20px">'+dn.map(function(s){return '<li><b>'+s[1]+':</b> '+s[2]+'</li>'}).join('')+'</ul>':'<div class="l">Henüz tamamlanan aşama yok.</div>';
+ if(n<0){head='Tüm aşamalar tamamlandı';pct=100}
+ else{var pv=n?ST[n-1][0]:0;pct=Math.min(100,(h-pv)/(ST[n][0]-pv)*100);head='Sıradaki: '+ST[n][1]+' · '+ST[n][2]}
+ var rows=ST.map(function(s){var p=Math.min(100,h/s[0]*100);
+  return '<div class="st"><b>'+s[1]+'</b><div class="bar s" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(p)+'" aria-label="'+s[2]+'"><i style="width:'+p+'%"></i></div><span>'+(p>=100?'✓':'')+'</span></div>'}).join('');
+ return '<h2>Sağlık iyileşme çizelgesi</h2><div class="c"><div class="l">Son sigaradan beri: '+Math.floor(h/24)+' gün '+Math.floor(h%24)+' saat</div><p style="margin:6px 0">'+head+'</p><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct)+'"><i style="width:'+pct+'%"></i></div>'+(n<0?'':'<div class="l" style="margin-top:4px">Kalan: '+left(ST[n][0]-h)+'</div>')+'<div style="margin-top:10px">'+rows+'</div><div class="l">Genel popülasyon verileridir; bireysel süreler değişir.</div></div><h2>Gerçekleşenler</h2><div class="c" style="margin-top:0">'+ok+'</div>'}
+
+function dtLocal(ts){var d=new Date(ts);return ds(d)+'T'+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function setup(){return '<h1>Kurulum</h1><div class="c"><label>Bırakma tarihi ve saati</label><input type="datetime-local" id="q" value="'+dtLocal(Date.now())+'"><label>Günde içilen adet</label><input type="number" id="pd" value="20" min="1"><label>Paket fiyatı (₺)</label><input type="number" id="pp" value="100" min="1"><label>Pakette adet</label><input type="number" id="sz" value="20" min="1"><button class="p" onclick="doSetup()">Başlat</button></div>'}
+function doSetup(){var t=new Date($('q').value).getTime();if(!isFinite(t))t=Date.now();
+ S.quitTs=t;S.quitAt=ds(new Date(t));S.perDay=pos($('pd').value,20);S.pack=pos($('pp').value,100);S.size=pos($('sz').value,20);save();tab='bugun';draw()}
+function ayar(){var ls=new Date(Date.now()-hours()*36e5),n=Math.max(S.relapse.length,S.relTs.length);
+ return '<h1>Ayarlar</h1><div class="c" style="margin-top:0"><label>Bırakma tarihi ve saati</label><input type="datetime-local" id="q" value="'+dtLocal(S.quitTs)+'"><label>Günde içilen adet</label><input type="number" id="pd" value="'+S.perDay+'" min="1"><label>Paket fiyatı (₺)</label><input type="number" id="pp" value="'+S.pack+'" min="1"><label>Pakette adet</label><input type="number" id="sz" value="'+S.size+'" min="1"><div class="l" style="margin-top:10px">Çizelge şu anı baz alıyor (son sigara): '+ls.toLocaleString('tr-TR')+'</div>'+(n?'<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cn" style="width:auto"> Kayıtlı '+n+' nüksü de sil</label>':'')+'<button class="p" onclick="saveSet()">Kaydet</button>'+(msg?'<div class="msg" role="status">'+esc(msg)+'</div>':'')+'</div>'}
+function saveSet(){var t=new Date($('q').value).getTime();if(isFinite(t)){S.quitTs=t;S.quitAt=ds(new Date(t))}
+ if($('cn')&&$('cn').checked){S.relapse=[];S.relTs=[]}
+ S.perDay=pos($('pd').value,S.perDay);S.pack=pos($('pp').value,S.pack);S.size=pos($('sz').value,S.size);save();msg='Ayarlar kaydedildi.';draw()}
+
+/* Bugün: kriz ekleme/düzenleme ve günlük kayıt */
+function syncDay(){var L=lg(ds());if($('nt')){L.note=$('nt').value.slice(0,200);L.nrt=$('nr').value==='Evet'}return L}
+function crisisRows(L){return L.list.map(function(c,i){
+ return '<div class="c"><div class="l">'+(i+1)+'. kriz'+(c.ts?' · '+hm(c.ts):'')+(c.sev?' · şiddet '+c.sev:'')+'</div><div class="g"><div><label>Tetikleyici</label><select onchange="editC('+i+',\'trig\',this.value)">'+opts(TR,c.trig)+'</select></div><div><label>Çözüm</label><select onchange="editC('+i+',\'brake\',this.value)">'+opts(BR,c.brake)+'</select></div></div><button class="d" onclick="delC('+i+')">Bu krizi sil</button></div>'}).join('')}
+function bugun(){var s=stats(),t=ds(),L=lg(t);
+ return '<h1>Bugün · Gün '+(dd(S.quitAt,t)+1)+'</h1><div class="g"><div class="c"><div class="n">'+s.streak+'</div><div class="l">Temiz gün serisi</div></div><div class="c"><div class="n">'+tl(s.money)+'</div><div class="l">Cebimde kalan</div></div><div class="c"><div class="n">'+s.avoided+'</div><div class="l">İçilmeyen sigara</div></div><div class="c"><div class="n">'+L.list.length+'</div><div class="l">Bugünkü kriz</div></div></div>'
+ +'<div id="tl">'+tlHTML()+'</div>'
+ +'<h2>Yeni kriz ekle</h2><div class="c" style="margin-top:0"><div class="g"><div><label>Tetikleyici</label><select id="ntg">'+opts(TR,'-')+'</select></div><div><label>Çözüm</label><select id="nbr">'+opts(BR,'-')+'</select></div></div><label>Şiddet (1-10, isteğe bağlı)</label><select id="nsv">'+opts(SV,'-')+'</select><button class="p" onclick="addCrisis()">+ Krizi ekle</button>'+(msg?'<div class="msg" role="status">'+esc(msg)+'</div>':'')+'</div>'
+ +(L.list.length?'<h2>Bugünkü krizler</h2>'+crisisRows(L):'')
+ +'<h2>Gün notu</h2><div class="c" style="margin-top:0"><label>Replasman/ilaç kullanıldı mı</label><select id="nr">'+opts(['Hayır','Evet'],L.nrt?'Evet':'Hayır')+'</select><label>Günün notu (1-2 cümle)</label><textarea id="nt" rows="2" maxlength="200" placeholder="Bugün neler oldu?">'+esc(L.note)+'</textarea><button class="p" onclick="saveDay()">Kaydet</button></div>'
+ +'<button class="d" onclick="relap()">'+(rl?'Emin misin? Seriyi sıfırla (tekrar dokun)':'Sigara içtim (seriyi sıfırla)')+'</button>'}
+function addCrisis(){var L=syncDay();L.list.push({ts:Date.now(),trig:$('ntg').value,brake:$('nbr').value,sev:cl($('nsv').value,10)});save();msg='Kriz eklendi.';draw()}
+function editC(i,f,v){var L=lg(ds());if(L.list[i]){L.list[i][f]=str(v);save()}}
+function delC(i){var L=syncDay();L.list.splice(i,1);save();msg='';draw()}
+function saveDay(){syncDay();save();msg='Kaydedildi.';draw()}
+function relap(){if(!rl){rl=true;draw();setTimeout(function(){rl=false},4000);return}
+ rl=false;var t=ds();if(S.relapse.indexOf(t)<0)S.relapse.push(t);S.relTs.push(Date.now());save();draw()}
+
+/* Acil fren */
+function acil(){return '<h1>Acil Fren</h1><div class="c"><div class="big" id="cd">3:00</div><div class="ph" id="ph">İstek sinyaldir, emir değil. Süreyi başlat.</div><div class="ph" id="br2" style="color:var(--mu)"></div><button class="p" id="go" onclick="startT()">Başlat</button></div><div id="fin"></div>'}
+function startT(){clearInterval(tm);var t0=Date.now();$('go').style.display='none';$('fin').innerHTML='';
+ tm=setInterval(function(){if(!$('cd')){clearInterval(tm);return}
+  var e=Math.floor((Date.now()-t0)/1000),rem=Math.max(0,180-e);
+  $('cd').textContent=Math.floor(rem/60)+':'+String(rem%60).padStart(2,'0');$('ph').textContent=P[Math.min(2,Math.floor(e/60))];
+  $('br2').textContent=e<60?(e%10<4?'Nefes al…':'Ver…'):'';
+  if(rem<=0){clearInterval(tm);
+   try{if(navigator.vibrate)navigator.vibrate([300,150,300,150,600])}catch(x){}
+   $('ph').textContent='Süre doldu. Şiddeti kaydet (1-10):';
+   var h='';for(var i=1;i<=10;i++)h+='<button onclick="logC('+i+')">'+i+'</button>';
+   $('fin').innerHTML='<div class="c"><div class="sev">'+h+'</div></div><p class="l">Hâlâ yüksekse sakız çiğne, 3 dk daha yürü.</p>'}},500)}
+function logC(v){lg(ds()).list.push({ts:Date.now(),trig:'-',brake:'-',sev:v});save();tab='bugun';msg='Kriz eklendi. Tetikleyici ve çözümü aşağıdaki listeden seçebilirsin.';draw()}
+
+/* Geçmiş ve yedekleme */
+function dayCard(k){var L=S.logs[k]||norm({}),mx=0;L.list.forEach(function(c){if(c.sev>mx)mx=c.sev});
+ return '<div class="c"><b>'+k.slice(5)+(S.relapse.indexOf(k)>=0?' ✕':'')+'</b> · '+L.list.length+' kriz'+(mx?' · en yüksek şiddet '+mx:'')+' · NRT '+(L.nrt?'E':'H')
+ +(L.list.length?'<ol style="margin:6px 0 0;padding-left:20px">'+L.list.map(function(c){return '<li>'+(c.ts?hm(c.ts)+' · ':'')+esc(c.trig)+' → '+esc(c.brake)+(c.sev?' · şiddet '+c.sev:'')+'</li>'}).join('')+'</ol>':'')
+ +(L.note?'<div class="l" style="margin-top:6px">Not: '+esc(L.note)+'</div>':'')+'</div>'}
+function gecmis(){var cards='',tot=0,cnt=0,i,t=new Date();
+ for(i=0;i<14;i++){var x=new Date(t);x.setDate(t.getDate()-i);var k=ds(x);if(k<S.quitAt)break;
+  if(i<7){tot+=(S.logs[k]||{list:[]}).list.length;cnt++}cards+=dayCard(k)}
+ return '<h1>Geçmiş</h1><div class="c" style="margin-top:0"><div class="n">'+(cnt?(tot/cnt).toFixed(1):'0')+'</div><div class="l">Son 7 gün ort. günlük kriz</div></div><h2>Son 14 gün (✕ = nüks)</h2>'+cards
+ +'<h2>Yedekleme</h2>'+(msg?'<div class="msg" role="status">'+esc(msg)+'</div>':'')
+ +'<button class="p" onclick="backup()">Verilerimi Yedekle</button><button onclick="$(\'fl\').click()">Yedekten Geri Yükle</button><input type="file" id="fl" accept=".json,application/json" hidden onchange="onFile(event)">'
+ +(pend?'<button class="d" onclick="applyPend()">Evet, mevcut verinin üzerine yaz</button><button onclick="pend=null;msg=\'\';draw()">Vazgeç</button>':'')
+ +(raw?'<label>Yedek metni (kopyalayıp sakla)</label><textarea rows="5" readonly onfocus="this.select()">'+esc(raw)+'</textarea>':'')
+ +'<button class="d" onclick="resetAll()">'+(rl?'Tüm veriyi sil (tekrar dokun)':'Tüm veriyi sıfırla')+'</button>'}
+function saveFile(name,data,type){
+ if(DL)return DL.save({filename:name,data:data});
+ return new Promise(function(ok,no){try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000);ok()}catch(e){no(e)}})}
+function backup(){var j=JSON.stringify(S,null,2);
+ saveFile('birak-yedek-'+ds()+'.json',j,'application/json').then(function(){raw='';msg='Yedek kaydedildi.';draw()})
+  .catch(function(e){raw=j;msg=e&&e.code==='declined'?'İndirme iptal edildi.':'İndirilemedi. Metni kopyalayıp sakla.';draw()})}
+function clean(o){if(!o||typeof o!=='object'||!o.logs||typeof o.logs!=='object')throw 0;
+ var R=/^\d{4}-\d\d-\d\d$/,q=+o.quitTs;
+ if(!isFinite(q)||q<=0){if(R.test(o.quitAt))q=new Date(o.quitAt+'T00:00:00').getTime();else q=0}
+ var n={quitTs:q||undefined,quitAt:q?ds(new Date(q)):undefined,perDay:pos(o.perDay,20),pack:pos(o.pack,100),size:pos(o.size,20),logs:{},relapse:[],relTs:[],
+  smokes:(Array.isArray(o.smokes)?o.smokes:[]).slice(0,5000).filter(function(c){return c&&isFinite(+c.ts)&&(c.type==='istek'||c.type==='alışkanlık')}).map(function(c){return{ts:+c.ts,why:str(c.why),type:c.type,note:String(c.note||'').slice(0,100)}})};
+ Object.keys(o.logs).forEach(function(k){if(!R.test(k))return;var x=o.logs[k]||{},e={nrt:!!x.nrt,note:String(x.note||'').slice(0,200)};
+  if(Array.isArray(x.list))e.list=x.list.slice(0,200).map(function(c){c=c||{};return{ts:isFinite(+c.ts)?+c.ts:0,trig:str(c.trig),brake:str(c.brake),sev:cl(c.sev,10)}});
+  else{e.crises=cl(x.crises,999);e.trig=str(x.trig);e.brake=str(x.brake);e.maxSev=cl(x.maxSev,10)}
+  n.logs[k]=norm(e)});
+ (Array.isArray(o.relapse)?o.relapse:[]).forEach(function(d){if(R.test(d))n.relapse.push(d)});
+ (Array.isArray(o.relTs)?o.relTs:[]).forEach(function(t){if(isFinite(+t))n.relTs.push(+t)});
+ return n}
+function onFile(ev){var f=ev.target.files[0];ev.target.value='';if(!f)return;var r=new FileReader();
+ r.onload=function(){try{pend=clean(JSON.parse(r.result));msg='Yedek okundu: '+Object.keys(pend.logs).length+' günlük kayıt, '+pend.smokes.length+' sigara kaydı. Mevcut verinin üzerine yazılsın mı?'}catch(e){pend=null;msg='Dosya geçerli bir yedek değil.'}draw()};
+ r.onerror=function(){msg='Dosya okunamadı.';draw()};r.readAsText(f)}
+function applyPend(){S=pend;pend=null;save();msg='Yedek geri yüklendi.';draw()}
+function resetAll(){if(!rl){rl=true;draw();setTimeout(function(){rl=false},4000);return}
+ rl=false;S={logs:{},relapse:[],relTs:[],smokes:[]};save();tab='bugun';msg='';draw()}
+
+/* Sigara günlüğü (bırakmadan önce de çalışır) */
+var NE=['-','uyanınca (ilk sigara)','kahve/çay','yemek sonrası','stres/sinir','sıkıntı/boşluk','sosyal ortam','alkol','iş molası','telefon/ekran','yol/araç','bekleme','diğer'];
+var BL=['Sabah 05-11','Öğle 11-14','İkindi 14-18','Akşam 18-23','Gece 23-05'],shr='',smsg='';
+function tabs(){return S.quitTs?T:[['gunluk','Günlük'],['proto','Protokol'],['kurulum','Kurulum']]}
+function pc(a,b){return b?Math.round(a/b*100):0}
+function blk(h){return h>=5&&h<11?0:h>=11&&h<14?1:h>=14&&h<18?2:h>=18&&h<23?3:4}
+function hhmm(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function dts(ts){return ds(new Date(ts)).slice(5)+' '+hm(ts)}
+function an(){var A=S.smokes,n=A.length,days={},first={},bl=[0,0,0,0,0],tr={},ist=0;if(!n)return null;
+ A.forEach(function(c){var d=new Date(c.ts),k=ds(d),m=d.getHours()*60+d.getMinutes(),t=tr[c.why]||(tr[c.why]={n:0,i:0});days[k]=1;if(first[k]==null||m<first[k])first[k]=m;bl[blk(d.getHours())]++;t.n++;if(c.type==='istek'){ist++;t.i++}});
+ var fk=Object.keys(first),fm=fk.reduce(function(s,k){return s+first[k]},0)/fk.length,nd=Object.keys(days).length;
+ return{n:n,nd:nd,avg:(n/nd).toFixed(1),ist:ist,ali:n-ist,fm:Math.round(fm),bl:bl,tr:Object.keys(tr).map(function(k){return{k:k,n:tr[k].n,i:tr[k].i}}).sort(function(a,b){return b.n-a.n})}}
+function gunluk(){var a=an(),h='<h1>Sigara Günlüğü</h1><div class="c" style="margin-top:0"><div class="l">Her sigarayı yaktığında kaydet. İstek: içeride çekme veya huzursuzluk hissettim. Alışkanlık: düşünmeden elim gitti, ortam tetikledi.</div><label>Neden / bağlam</label><select id="sw">'+opts(NE,'-')+'</select><label>Tür</label><select id="sty">'+opts(['-','istek','alışkanlık'],'-')+'</select><label>Zaman</label><input type="datetime-local" id="sdt" value="'+dtLocal(Date.now())+'"><label>Not (isteğe bağlı)</label><input type="text" id="sno" maxlength="100"><button class="p" onclick="addSmoke()">+ Sigarayı kaydet</button><div class="msg" id="gm" role="status">'+esc(msg)+'</div></div>';
+ if(!a)return h+'<div class="c"><div class="l">Henüz kayıt yok. Birkaç gün kayıt tutunca analiz burada görünür.</div></div>';
+ var mx=Math.max.apply(null,a.bl),i,n=S.smokes.length;
+ h+='<h2>Özet</h2><div class="g"><div class="c"><div class="n">'+a.n+'</div><div class="l">Toplam sigara ('+a.nd+' gün)</div></div><div class="c"><div class="n">'+a.avg+'</div><div class="l">Günde ortalama</div></div></div>'
+ +'<div class="c"><div class="sp"><span>İstek %'+pc(a.ist,a.n)+' ('+a.ist+')</span><span>Alışkanlık %'+pc(a.ali,a.n)+' ('+a.ali+')</span></div><div class="bar"><i style="width:'+pc(a.ist,a.n)+'%"></i></div><div class="l" style="margin-top:6px">Günün ilk kaydı ortalama saat '+hhmm(a.fm)+'</div></div>'
+ +'<h2>Saat dilimleri</h2><div class="c" style="margin-top:0">'+BL.map(function(b,j){return '<div class="st"><b style="width:100px">'+b+'</b><div class="bar s"><i style="width:'+pc(a.bl[j],mx)+'%"></i></div><span style="width:28px">'+a.bl[j]+'</span></div>'}).join('')+'</div>'
+ +'<h2>Nedenler ve istek oranı</h2><div class="c" style="margin-top:0">'+a.tr.map(function(t){return '<div style="margin:8px 0"><div class="sp"><span>'+esc(t.k)+' · '+t.n+'</span><span>istek %'+pc(t.i,t.n)+'</span></div><div class="bar"><i style="width:'+pc(t.i,t.n)+'%"></i></div></div>'}).join('')+'</div>'
+ +'<h2>Son kayıtlar</h2>';
+ for(i=n-1;i>=Math.max(0,n-30);i--){var c=S.smokes[i];h+='<div class="c" style="display:flex;gap:8px;align-items:center"><div style="flex:1"><b>'+dts(c.ts)+'</b> · '+esc(c.why)+' · '+esc(c.type)+(c.note?'<div class="l">'+esc(c.note)+'</div>':'')+'</div><button class="d" style="width:auto;margin:0" onclick="delS('+i+')" aria-label="Kaydı sil">✕</button></div>'}
+ return h+'<h2>Paylaş</h2><div class="c" style="margin-top:0"><div class="l">Özeti bir yapay zekâ asistanına yapıştırıp analiz ettirebilirsin. Göndermeden önce metni gözden geçir; paylaştığın bilgiler cihazından çıkar.</div><button class="p" onclick="shareRep()">Özeti paylaş / kopyala</button>'+'<button onclick="dlRep()">Dosya olarak indir (.txt)</button>'+(smsg?'<div class="msg" role="status">'+esc(smsg)+'</div>':'')+(shr?'<textarea rows="8" readonly onfocus="this.select()">'+esc(shr)+'</textarea>':'')+'</div>'}
+function addSmoke(){var w=$('sw').value,ty=$('sty').value,t=new Date($('sdt').value).getTime();
+ if(w==='-'||ty==='-'){$('gm').textContent='Neden ve türü seç.';return}
+ if(!isFinite(t))t=Date.now();
+ S.smokes.push({ts:t,why:w,type:ty,note:$('sno').value.slice(0,100)});S.smokes.sort(function(a,b){return a.ts-b.ts});save();msg='Kaydedildi.';draw()}
+function delS(i){S.smokes.splice(i,1);save();msg='';draw()}
+function rep(){var a=an();if(!a)return '';
+ var L=['Aşağıda kişisel sigara günlüğümün özeti var. Buna bakarak şunları analiz et: (1) hangi tetikleyiciler ağır basıyor, (2) sigaraların ne kadarı istek, ne kadarı alışkanlık, (3) bırakma planımda hangi tetikleyicilere öncelik vermeliyim. Tıbbi tanı koyma; pratik ve ölçülebilir öneriler ver.','','Toplam: '+a.n+' sigara, '+a.nd+' gün, günde ort. '+a.avg,'İstek: '+a.ist+' (%'+pc(a.ist,a.n)+') · Alışkanlık: '+a.ali+' (%'+pc(a.ali,a.n)+')','Günün ilk kaydı ort. saat: '+hhmm(a.fm),'Saat dilimleri: '+BL.map(function(b,i){return b+' '+a.bl[i]}).join(', '),'Nedenler (adet, istek oranı): '+a.tr.map(function(t){return t.k+' '+t.n+' (%'+pc(t.i,t.n)+' istek)'}).join('; '),'','Son kayıtlar (tarih saat | neden | tür | not):'];
+ S.smokes.slice(-60).forEach(function(c){L.push(ds(new Date(c.ts))+' '+hm(c.ts)+' | '+c.why+' | '+c.type+(c.note?' | '+c.note:''))});
+ return L.join('\n')}
+function shareRep(){shr=rep();
+ function done(m){smsg=m;draw()}
+ function copy(){if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(shr).then(function(){done('Özet kopyalandı.')}).catch(function(){done('Kopyalanamadı; aşağıdaki metni elle kopyala.')});else done('Aşağıdaki metni elle kopyala.')}
+ if(navigator.share){navigator.share({title:'Sigara günlüğü özeti',text:shr}).then(function(){done('Paylaşıldı.')}).catch(function(e){if(e&&e.name==='AbortError')done('Paylaşım iptal edildi.');else copy()});return}
+ copy()}
+function dlRep(){shr=rep();saveFile('sigara-gunlugu-'+ds()+'.txt',shr,'text/plain').then(function(){smsg='Dosya kaydedildi.';draw()}).catch(function(e){smsg=e&&e.code==='declined'?'İndirme iptal edildi.':'Dosya kaydedilemedi.';draw()})}
+
+function proto(){return '<h1>Protokol</h1><details open><summary>1. Biyolojik çerçeve</summary><ul><li>Nikotin reseptörlere bağlanır, dopamin salgılatır; reseptör sayısı artar.</li><li>Nikotin kesilince boş reseptörler istek üretir: kalibrasyon hatası, irade sorunu değil.</li><li>Normale dönüş yaklaşık 2-4 hafta.</li><li>İstek emir değil sinyaldir. Tek nefes döngüyü sıfırlar: azaltma değil kesme.</li></ul></details><details><summary>2. Via Negativa</summary><ul><li>Kahve: ilk 2-3 hafta bağlamı değiştir (farklı yer/bardak ya da çay).</li><li>Yemek sonrası: hemen kalk, diş fırçala veya 5 dk yürü.</li><li>Alkol ve sigara içilen ortamlar: ilk 2-4 hafta çıkar.</li><li>Çakmak, kül tablası, paketleri at.</li><li>Bir kişiye bildir, ondan sigara istememesini söyle.</li><li>NRT veya reçeteli ilaçlar için doktor/eczacıya danış.</li></ul></details><details><summary>3. Kriz protokolü</summary><ol><li>Süreyi başlat.</li><li>0-1 dk: 4 sn al, 6-8 sn ver.</li><li>1-2 dk: soğuk su.</li><li>2-3 dk: ortam değiştir.</li><li>Şiddeti kaydet; yüksekse sakız + 3 dk yürüyüş.</li></ol></details><details><summary>Nüks olursa</summary><p>Seriyi sıfırla, tetikleyiciyi kaydet, aynı gün devam et.</p></details>'}
+
+function draw(){clearInterval(tm);clearInterval(tlt);
+ var tb=tabs();if(!tb.some(function(x){return x[0]===tab}))tab=tb[0][0];
+ $('m').innerHTML=({bugun:bugun,acil:acil,gunluk:gunluk,gecmis:gecmis,proto:proto,ayar:ayar,kurulum:setup})[tab]();
+ $('nv').innerHTML=tb.map(function(x){return '<button class="'+(x[0]===tab?'a':'')+'" onclick="go2(\''+x[0]+'\')">'+x[1]+'</button>'}).join('');
+ if(tab==='bugun')tlt=setInterval(function(){var e=$('tl');if(e)e.innerHTML=tlHTML()},60000)}
+function go2(t){tab=t;rl=false;msg='';raw='';shr='';smsg='';pend=null;draw()}
+if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(function(){});
+draw();
+</script>
+</body>
+</html>
